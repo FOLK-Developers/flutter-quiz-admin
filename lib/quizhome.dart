@@ -22,17 +22,21 @@ class _QuizHomeState extends State<QuizHome> {
           child: StreamBuilder(
             stream: Firestore.instance.collection('Quizes').document(widget.documentId).collection('Questions').snapshots(),
             builder: (context, snapshot){
-              return ListView(
-                children: List.generate(snapshot.data.documents.length, (index) {
-                  return Card(
-                    elevation: 5.0,
-                    child: ListTile(
-                      title: Text(snapshot.data.documents[index].data['question']),
-                      subtitle: Text(snapshot.data.documents[index].data['question_type']),
-                    ),
-                  );
-                }),
-              );
+              if(!snapshot.hasData){
+                return LinearProgressIndicator();
+              } else {
+                return ListView(
+                  children: List.generate(snapshot.data.documents.length, (index) {
+                    return Card(
+                      elevation: 5.0,
+                      child: ListTile(
+                        title: Text(snapshot.data.documents[index].data['question']),
+                        subtitle: Text(snapshot.data.documents[index].data['question_type']),
+                      ),
+                    );
+                  }),
+                );
+              }
             },
           ),
         ),
@@ -54,7 +58,7 @@ class _QuizHomeState extends State<QuizHome> {
                   heroTag: 'Delete',
                   tooltip: 'Delete Question',
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => DeleteQuestion(),));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => DeleteQuestion(documentId: widget.documentId,),));
                   },
                   child: Icon(Icons.delete),
                 )

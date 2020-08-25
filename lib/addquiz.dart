@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:quizadmin/firestoreactions.dart';
 
 class AddQuiz extends StatefulWidget {
+  final bool quiz;
+  AddQuiz({@required this.quiz});
   @override
   _AddQuizState createState() => _AddQuizState();
 }
@@ -17,7 +19,7 @@ class _AddQuizState extends State<AddQuiz> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Add Quiz'),
+          title: Text((widget.quiz)?'Add Quiz':'Add Poll'),
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -38,7 +40,7 @@ class _AddQuizState extends State<AddQuiz> {
                       keyboardType: TextInputType.text,
                       autofocus: false,
                       decoration: InputDecoration(
-                        hintText: 'Quiz Name',
+                        hintText: (widget.quiz)?'Quiz name':'Poll name',
 //                hintStyle: TextStyle(fontSize: _height*0.025),
                       ),
                     ),
@@ -53,7 +55,7 @@ class _AddQuizState extends State<AddQuiz> {
                 height: 20.0,
               ),
               RaisedButton(
-                onPressed: () => _startDate(context), // Refer step 3
+                onPressed: () => _startDate(context),
                 child: Text(
                   'Select Start Date',
                   style:
@@ -69,7 +71,7 @@ class _AddQuizState extends State<AddQuiz> {
                 height: 20.0,
               ),
               RaisedButton(
-                onPressed: () => _endDate(context), // Refer step 3
+                onPressed: () => _endDate(context),
                 child: Text(
                   'Select End Date',
                   style:
@@ -81,16 +83,11 @@ class _AddQuizState extends State<AddQuiz> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
           onPressed: (){
             if (_quizName.text.isNotEmpty){
               uploading();
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => AddQuiz(),
-                  transitionDuration: Duration.zero,
-                ),
-              );
+              Navigator.pop(context);
             }
           },
         ),
@@ -101,7 +98,7 @@ class _AddQuizState extends State<AddQuiz> {
   _startDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: startDate, // Refer step 1
+      initialDate: startDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2021),
     );
@@ -114,7 +111,7 @@ class _AddQuizState extends State<AddQuiz> {
   _endDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: endDate, // Refer step 1
+      initialDate: endDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2021),
     );
@@ -124,8 +121,13 @@ class _AddQuizState extends State<AddQuiz> {
       });
   }
 
-  Quizes _quizes = Quizes();
   uploading(){
-    _quizes.addQuiz(_quizName.text, startDate.millisecondsSinceEpoch, endDate.millisecondsSinceEpoch);
+    if (widget.quiz){
+      Quizes _quizes = Quizes();
+      _quizes.addQuiz(_quizName.text, startDate.millisecondsSinceEpoch, endDate.millisecondsSinceEpoch);
+    } else {
+      Polls _polls = Polls();
+      _polls.addPoll(_quizName.text, startDate.millisecondsSinceEpoch, endDate.millisecondsSinceEpoch);
+    }
   }
 }

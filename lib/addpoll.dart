@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:quizadmin/firestoreactions.dart';
 
 class AddPoll extends StatefulWidget {
   final String documentId;
@@ -52,15 +53,42 @@ class _AddPollState extends State<AddPoll> {
     );
   }
 
+  void initState(){
+    _optionsControllers = [];
+    super.initState();
+  }
+
+  List<TextEditingController> _optionsControllers;
   Widget options(){
     if (questionType == 'LongPoll'){
-      return Form(
-        autovalidate: true,
-        child: Column(
-          children: List.generate(20, (index) => null),
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+            child: ExpansionTile(
+              title: Text('Options'),
+              children: List.generate(20, (index) {
+                _optionsControllers.add(TextEditingController());
+                return Card(
+                  child: TextField(
+                    controller: _optionsControllers.elementAt(index),
+                    textCapitalization: TextCapitalization.sentences,
+                    keyboardType: TextInputType.text,
+                    autofocus: false,
+                    decoration: InputDecoration(
+                      hintText: 'Option',
+//                hintStyle: TextStyle(fontSize: _height*0.025),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
         ),
       );
     } else {
+      _optionsControllers = [];
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25.0),
         child: Card(
@@ -234,9 +262,33 @@ class _AddPollState extends State<AddPoll> {
                     ),
                   ),
                 ),
-              )
+              ),
+              options(),
+              mediaOptions()
             ],
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            PollQuestions _pollQuestions = PollQuestions(documentId: widget.documentId);
+            if(questionType == 'Poll'){
+              _pollQuestions.poll(_question.text, questionType, (image == 'Yes')?_imageLink.text:null, (video == 'Yes')?_videoId.text:null, [_option1.text, _option2.text, _option3.text, _option4.text]);
+            } else if (questionType == 'LongPoll'){
+              List<String> _answers = [];
+              _optionsControllers.forEach((element) {_answers.add(element.text);});
+              _pollQuestions.longPoll(_question.text, questionType, (image == 'Yes')?_imageLink.text:null, (video == 'Yes')?_videoId.text:null, _answers);
+              _answers = [];
+            }
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => AddPoll(documentId: widget.documentId,),
+                transitionDuration: Duration.zero,
+              ),
+            );
+          },
+          tooltip: 'Add Poll',
+          child: Icon(Icons.add),
         ),
       ),
     );

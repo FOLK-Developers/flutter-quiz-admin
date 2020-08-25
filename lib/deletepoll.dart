@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quizadmin/firestoreactions.dart';
 
 class DeletePoll extends StatefulWidget {
   final String documentId;
@@ -42,7 +43,8 @@ class _DeletePollState extends State<DeletePoll> {
                                       child: Text('continue'),
                                       onPressed: (){
                                         Navigator.of(context).pop();
-//                                      _question.delQuestion(snapshot.data['questions'][index]['question'], index);
+                                        PollQuestions _pollQuestions = PollQuestions(documentId: widget.documentId);
+                                        _pollQuestions.delQuestion(snapshot.data.documents[index].documentID);
                                       },
                                     ),
                                     FlatButton(

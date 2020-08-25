@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
                   heroTag: 'Add',
                   tooltip: (_selectedIndex==0)?'Add Quiz':'Add Poll',
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => AddQuiz(),));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => AddQuiz(quiz: quiz,),));
                   },
                   child: Icon(Icons.add),
                 ),
@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                   heroTag: 'Delete',
                   tooltip: (_selectedIndex==0)?'Delete Quiz':'Delete Poll',
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => DeleteQuiz(),));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => DeleteQuiz(quiz: quiz,),));
                   },
                   child: Icon(Icons.delete),
                 )
@@ -112,15 +112,15 @@ class _HomePageState extends State<HomePage> {
       return new DataRow(
           onSelectChanged: (selected){
             if(selected){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => QuizHome(documentId: snapshot.data.documents[index].documentId)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => QuizHome(documentId: snapshot.data.documents[index].documentID)));
             } else {
               print('not selected');
             }
           },
           cells: [
             DataCell(Text(snapshot.data.documents[index].documentID)),
-            DataCell(Text(snapshot.data.documents[index].data['start_time'].toString())),
-            DataCell(Text(snapshot.data.documents[index].data['end_time'].toString())),
+            DataCell(Text(DateTime.fromMillisecondsSinceEpoch(snapshot.data.documents[index].data['start_time']).toLocal().toString().split(' ')[0])),
+            DataCell(Text(DateTime.fromMillisecondsSinceEpoch(snapshot.data.documents[index].data['end_time']).toLocal().toString().split(' ')[0])),
           ]);
     });
     return newList;
@@ -164,15 +164,15 @@ class _HomePageState extends State<HomePage> {
       return new DataRow(
           onSelectChanged: (selected){
             if(selected){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PollHome(documentId: snapshot.data.documents[index].documentId)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PollHome(documentId: snapshot.data.documents[index].documentID)));
             } else {
               print('not selected');
             }
           },
           cells: [
             DataCell(Text(snapshot.data.documents[index].documentID)),
-            DataCell(Text(snapshot.data.documents[index].data['start_time'].toString())),
-            DataCell(Text(snapshot.data.documents[index].data['end_time'].toString())),
+            DataCell(Text(DateTime.fromMillisecondsSinceEpoch(snapshot.data.documents[index].data['start_time']).toLocal().toString().split(' ')[0])),
+            DataCell(Text(DateTime.fromMillisecondsSinceEpoch(snapshot.data.documents[index].data['end_time']).toLocal().toString().split(' ')[0])),
           ]);
     });
     return newList;

@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:quizadmin/firestoreactions.dart';
 
 class DeleteQuiz extends StatefulWidget {
+  final bool quiz;
+  DeleteQuiz({@required this.quiz});
   @override
   _DeleteQuizState createState() => _DeleteQuizState();
 }
 
 class _DeleteQuizState extends State<DeleteQuiz> {
-  Quizes _quizes = Quizes();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -18,10 +19,10 @@ class _DeleteQuizState extends State<DeleteQuiz> {
         ),
         body: Center(
           child: StreamBuilder(
-            stream: Firestore.instance.collection('Quizes').where("start_time", isEqualTo: 1).snapshots(),
+            stream: Firestore.instance.collection((widget.quiz)?'Quizes':'Polls').snapshots(),
             builder: (context, snapshot){
               if (!snapshot.hasData) {
-                return Text('Loading');
+                return LinearProgressIndicator();
               } else {
                 return ListView(
                   children: List.generate(snapshot.data.documents.length, (index) {
@@ -29,7 +30,6 @@ class _DeleteQuizState extends State<DeleteQuiz> {
                       elevation: 5.0,
                       child: ListTile(
                         title: Text(snapshot.data.documents[index].documentID ?? "null"),
-//                        subtitle: Text(snapshot.data['questions'][index]['question_type']),
                         onTap: (){
                           showDialog(
                               context: context,
@@ -42,8 +42,13 @@ class _DeleteQuizState extends State<DeleteQuiz> {
                                       child: Text('continue'),
                                       onPressed: (){
                                         Navigator.of(context).pop();
-                                        _quizes.delQuiz(snapshot.data.documents[index].documentID);
-//                                        _question.delQuestion(snapshot.data['questions'][index]['question'], index);
+                                        if(widget.quiz){
+                                          Quizes _quizes = Quizes();
+                                          _quizes.delQuiz(snapshot.data.documents[index].documentID);
+                                        } else {
+                                          Polls _polls = Polls();
+                                          _polls.delPoll(snapshot.data.documents[index].documentID);
+                                        }
                                       },
                                     ),
                                     FlatButton(
