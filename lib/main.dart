@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quizadmin/deletequestion.dart';
 import 'package:quizadmin/home.dart';
 
 void main() {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'package:quizadmin/firestoreactions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firestoreactions.dart';
 
 class DeleteQuestion extends StatefulWidget {
   final String documentId;
@@ -10,7 +10,6 @@ class DeleteQuestion extends StatefulWidget {
 }
 
 class _DeleteQuestionState extends State<DeleteQuestion> {
-  Questions _question = Questions();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -44,7 +43,8 @@ class _DeleteQuestionState extends State<DeleteQuestion> {
                                     child: Text('continue'),
                                     onPressed: (){
                                       Navigator.of(context).pop();
-//                                      _question.delQuestion(snapshot.data['questions'][index]['question'], index);
+                                      Questions _question = Questions(documentId: widget.documentId);
+                                      _question.delQuestion(snapshot.data.documents[index].documentID);
                                     },
                                   ),
                                   FlatButton(

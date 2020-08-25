@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:quizadmin/firestoreactions.dart';
+import 'firestoreactions.dart';
 
 class AddQuestion extends StatefulWidget {
   final String documentId;
@@ -20,60 +20,105 @@ class _AddQuestionState extends State<AddQuestion> {
   final _option2 = TextEditingController();
   final _option3 = TextEditingController();
   final _option4 = TextEditingController();
+  List<TextEditingController> _optionsControllers = [];
   Widget options(){
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
-          child: ExpansionTile(
-            title: Text('Options'),
-            children: <Widget>[
-              TextField(
-                controller: _option1,
-                textCapitalization: TextCapitalization.sentences,
-                keyboardType: TextInputType.text,
-                autofocus: false,
-                decoration: InputDecoration(
-                  hintText: 'Option',
+    if (questionType == 'LongPoll'){
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+            child: ExpansionTile(
+              title: Text('Options'),
+              children: List.generate(20, (index) {
+                _optionsControllers.add(TextEditingController());
+                return Card(
+                  child: TextField(
+                    controller: _optionsControllers.elementAt(index),
+                    textCapitalization: TextCapitalization.sentences,
+                    keyboardType: TextInputType.text,
+                    autofocus: false,
+                    decoration: InputDecoration(
+                      hintText: 'Option',
 //                hintStyle: TextStyle(fontSize: _height*0.025),
-                ),
-              ),
-              TextField(
-                controller: _option2,
-                textCapitalization: TextCapitalization.sentences,
-                keyboardType: TextInputType.text,
-                autofocus: false,
-                decoration: InputDecoration(
-                  hintText: 'Option',
-//                hintStyle: TextStyle(fontSize: _height*0.025),
-                ),
-              ),
-              (questionType == 'True/False') ? Container() : TextField(
-                controller: _option3,
-                textCapitalization: TextCapitalization.sentences,
-                keyboardType: TextInputType.text,
-                autofocus: false,
-                decoration: InputDecoration(
-                  hintText: 'Option',
-//                hintStyle: TextStyle(fontSize: _height*0.025),
-                ),
-              ),
-              (questionType == 'True/False') ? Container() : TextField(
-                controller: _option4,
-                textCapitalization: TextCapitalization.sentences,
-                keyboardType: TextInputType.text,
-                autofocus: false,
-                decoration: InputDecoration(
-                  hintText: 'Option',
-//                hintStyle: TextStyle(fontSize: _height*0.025),
-                ),
-              ),
-            ],
+                    ),
+                  ),
+                );
+              }),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      _optionsControllers = [];
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+            child: ExpansionTile(
+              title: Text('Options'),
+              children: <Widget>[
+                (questionType == 'Re-arrange')?Container(
+                  child: Flex(
+                    direction: Axis.horizontal,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          'Enter options in correct order they will be randomised',
+                          overflow: TextOverflow.visible,
+                        ),
+                      ),
+                    ],
+                  ),
+                ):Container(),
+                TextField(
+                  controller: _option1,
+                  textCapitalization: TextCapitalization.sentences,
+                  keyboardType: TextInputType.text,
+                  autofocus: false,
+                  decoration: InputDecoration(
+                    hintText: 'Option',
+//                hintStyle: TextStyle(fontSize: _height*0.025),
+                  ),
+                ),
+                TextField(
+                  controller: _option2,
+                  textCapitalization: TextCapitalization.sentences,
+                  keyboardType: TextInputType.text,
+                  autofocus: false,
+                  decoration: InputDecoration(
+                    hintText: 'Option',
+//                hintStyle: TextStyle(fontSize: _height*0.025),
+                  ),
+                ),
+                (questionType == 'True/False') ? Container() : TextField(
+                  controller: _option3,
+                  textCapitalization: TextCapitalization.sentences,
+                  keyboardType: TextInputType.text,
+                  autofocus: false,
+                  decoration: InputDecoration(
+                    hintText: 'Option',
+//                hintStyle: TextStyle(fontSize: _height*0.025),
+                  ),
+                ),
+                (questionType == 'True/False') ? Container() : TextField(
+                  controller: _option4,
+                  textCapitalization: TextCapitalization.sentences,
+                  keyboardType: TextInputType.text,
+                  autofocus: false,
+                  decoration: InputDecoration(
+                    hintText: 'Option',
+//                hintStyle: TextStyle(fontSize: _height*0.025),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   String questionType = 'Question Type';
@@ -105,7 +150,7 @@ class _AddQuestionState extends State<AddQuestion> {
                 }
               });
             },
-            items: <String>['Question Type', 'True/False', 'MCQ', 'Re-arrange', 'Poll']
+            items: <String>['Question Type', 'True/False', 'MCQ', 'Re-arrange', 'Poll', 'LongPoll']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
@@ -312,7 +357,7 @@ class _AddQuestionState extends State<AddQuestion> {
             options(),
             correctAnswer(),
             mediaOptions(),
-            (questionType == 'Poll')?Container():Padding(
+            (questionType == 'Poll' || questionType == 'LongPoll')?Container():Padding(
               padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
               child: Card(
                 child: Padding(
@@ -339,7 +384,7 @@ class _AddQuestionState extends State<AddQuestion> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (_, __, ___) => AddQuestion(),
+                pageBuilder: (_, __, ___) => AddQuestion(documentId: widget.documentId,),
                 transitionDuration: Duration.zero,
               ),
             );
@@ -428,7 +473,7 @@ class _AddQuestionState extends State<AddQuestion> {
 
   bool _validScore = false;
   scoreValidiation(){
-    if (questionType == 'Poll'){
+    if (questionType == 'Poll' || questionType == 'LongPoll'){
       _validScore = true;
     } else {
       if (_score.text.isEmpty){
@@ -472,6 +517,8 @@ class _AddQuestionState extends State<AddQuestion> {
             _validOptions = true;
           });
         }
+      } else if (questionType == 'LongPoll'){
+        _validOptions = true;
       }
     } else {
       _validOptions = false;
@@ -480,20 +527,27 @@ class _AddQuestionState extends State<AddQuestion> {
   }
 
   uploading(){
-    int score = int.parse(_score.text);
-    Questions upload = Questions();
+    Questions upload = Questions(documentId: widget.documentId);
     switch(questionType){
       case 'True/False':{
+        int score = int.parse(_score.text);
         upload.trueFalse(_question.text, questionType, (image == 'Yes')?_imageLink.text:null, (video == 'Yes')?_videoId.text:null, score, [_option1.text, _option2.text], rightAnswer);
       }break;
       case 'MCQ':{
+        int score = int.parse(_score.text);
         upload.mcq(_question.text, questionType, (image == 'Yes')?_imageLink.text:null, (video == 'Yes')?_videoId.text:null, score, [_option1.text, _option2.text, _option3.text, _option4.text], rightAnswer);
       }break;
       case 'Re-arrange':{
+        int score = int.parse(_score.text);
         upload.reArrange(_question.text, questionType, (image == 'Yes')?_imageLink.text:null, (video == 'Yes')?_videoId.text:null, score, [_option3.text, _option1.text, _option4.text, _option2.text], [_option1.text, _option2.text, _option3.text, _option4.text]);
       }break;
       case 'Poll':{
         upload.poll(_question.text, questionType, (image == 'Yes')?_imageLink.text:null, (video == 'Yes')?_videoId.text:null, [_option1.text, _option2.text, _option3.text, _option4.text]);
+      }break;
+      case 'LongPoll':{
+        List<String> _answers = [];
+        _optionsControllers.forEach((element) {_answers.add(element.text);});
+        upload.longPoll(_question.text, questionType, (image == 'Yes')?_imageLink.text:null, (video == 'Yes')?_videoId.text:null, _answers);
       }break;
       default:{
         _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Please choose a question type', textAlign: TextAlign.center,)));
